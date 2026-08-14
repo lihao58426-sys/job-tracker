@@ -106,9 +106,9 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             {Object.entries(stats.by_location).map(([city, count]) => (
               <div key={city} style={{
-                padding: '8px 18px', borderRadius: 20, background: city.includes('广州') || city.includes('深圳') ? '#e6f7ff' : '#f5f5f5',
+                padding: '8px 18px', borderRadius: 20, background: city.includes('上海') || city.includes('杭州') ? '#e6f7ff' : '#f5f5f5',
                 fontSize: 13, fontWeight: 500,
-                border: city.includes('广州') || city.includes('深圳') ? '1px solid #91d5ff' : '1px solid #e8e8e8',
+                border: city.includes('上海') || city.includes('杭州') ? '1px solid #91d5ff' : '1px solid #e8e8e8',
               }}>
                 {city} × {count}
               </div>

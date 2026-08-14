@@ -3,7 +3,6 @@
 """
 v2.0 打分流程：爬虫原始数据 → 分类 → 六维打分 → 发展前景 → 导入就绪
 ================================================================
-基于 40 天零基础转行 AI 开发（6 个 AI 项目），目标广深。
 """
 
 import json
@@ -34,12 +33,15 @@ USER_PROFILE = {
     "expected_salary_min": 15,         # 示例：期望月薪下限（K）
 }
 
+# 目标城市（示例占位值，本地使用请改回真实目标城市）
+TARGET_CITIES = ["上海", "杭州"]
+
 # 六维权重说明（不做加权，仅做评分参考）
 # ① 硬能力匹配度：JD要求的技能 vs 用户技能栈
 # ② 项目经验契合度：行业/业务 vs AI项目经验
-# ③ 经验层级适配度：JD要求年限 vs 零经验转行可行性
+# ③ 经验层级适配度：JD 要求年限 vs 候选者经验
 # ④ 薪资期望适配度：按 v2.0 rubric
-# ⑤ 企业规模适配度：公司规模 vs 转行友好度
+# ⑤ 企业规模适配度：公司规模 vs 新人友好度
 # ⑥ 成长空间适配度：公司赛道/技术方向的前景
 
 
@@ -208,7 +210,7 @@ def score_hard_skills(title: str, exp: str, company: str) -> int:
     """① 硬能力匹配度：看岗位对技术栈的要求"""
     t = title.lower()
     score = 5  # 起点
-    # 应届生友好 → 转行门槛低
+    # 应届生友好 → 门槛低
     if "应届生优先" in t or "应届生友好" in t or "应届" in t:
         score += 1
     # Agent 相关的岗位，用户有 LangChain/RAG 项目经验
@@ -283,14 +285,14 @@ def score_project_fit(title: str, industry: str, company: str) -> int:
 
 
 def score_level_fit(exp: str, edu: str) -> int:
-    """③ 经验层级适配度：JD年限 vs 零经验转行"""
+    """③ 经验层级适配度：JD 年限 vs 候选者经验"""
     exp_lower = exp.strip().lower()
     if "经验不限" in exp_lower or "不限" in exp_lower:
         return 9
     if "应届" in exp_lower or "实习" in exp_lower:
         return 9
     if any(pat in exp_lower for pat in ["1年", "1-2", "1-3", "1-4"]):
-        return 7  # 1年+门槛，转行可尝试
+        return 7  # 1年+门槛，可尝试
     if "2年" in exp_lower or "2-3" in exp_lower:
         return 6  # 2年门槛稍高但非硬阻
     if "5年以下" in exp_lower:
@@ -357,9 +359,9 @@ def score_growth(title: str, industry: str, funding: str, company: str, location
     if any(s in funding_lower for s in ["c轮", "d轮及以上"]):
         score += 1  # 后期独角兽，即将IPO
 
-    # 广深 + 高前景行业组合加成（替代白名单）
-    is_gz_sz = any(c in location for c in ["广州", "深圳"])
-    if is_gz_sz and industry in HIGH_GROWTH_INDUSTRIES:
+    # 目标城市 + 高前景行业组合加成
+    is_target_city = any(c in location for c in TARGET_CITIES)
+    if is_target_city and industry in HIGH_GROWTH_INDUSTRIES:
         score += 1
 
     return max(1, min(score, 10))
@@ -398,21 +400,21 @@ def assess_growth_potential(title: str, industry: str, funding: str, company: st
         signals.append("[上市] 体系成熟、背书价值高")
 
     # 城市
-    is_gz_sz = any(c in location for c in ["广州", "深圳"])
-    if is_gz_sz and industry in HIGH_GROWTH_INDUSTRIES:
-        signals.append("[广深+高前景行业] 目标组合")
-    elif is_gz_sz:
-        signals.append("[广深] 目标城市")
+    is_target_city = any(c in location for c in TARGET_CITIES)
+    if is_target_city and industry in HIGH_GROWTH_INDUSTRIES:
+        signals.append("[目标城市+高前景行业] 目标组合")
+    elif is_target_city:
+        signals.append("[目标城市] 加分")
 
     return " | ".join(signals) if signals else "需进一步调研"
 
 
 def get_location_bonus(location: str) -> int:
-    """广深 +1"""
+    """目标城市 +1"""
     if not location:
         return 0
     loc = location.strip()
-    if any(c in loc for c in ["广州", "深圳"]):
+    if any(c in loc for c in TARGET_CITIES):
         return 1
     return 0
 
@@ -636,7 +638,7 @@ def main():
         damage_str = f" !{damage}" if damage else ""
         print(f"{i:2}. [{r['verdict']:4}] {r['title'][:40]:40} | {r['company'][:20]:20} | "
               f"{r['location']:12} | {r['salary']:15} | "
-              f"总分{r['total_score']:2}({scores}+{loc_bonus}广深) 覆盖{cov:.0%}{damage_str}{nego}")
+              f"总分{r['total_score']:2}({scores}+{loc_bonus}目标城市) 覆盖{cov:.0%}{damage_str}{nego}")
         if r.get("growth_potential"):
             print(f"    前景: {r['growth_potential']}")
         gaps = r.get("jd_match_gaps", [])
@@ -702,7 +704,7 @@ def main():
             "reason": f"前景: {r.get('growth_potential', '')} | "
                       f"{r['score_hard']}+{r['score_project']}+{r['score_level']}+"
                       f"{r['score_salary']}+{r['score_scale']}+{r['score_growth']}+"
-                      f"{jd}+{loc_bonus}广深 = {r['total_score']}",
+                      f"{jd}+{loc_bonus}目标城市 = {r['total_score']}",
             "exp": r.get("exp", ""),
             "scale": r.get("scale", ""),
             # JD 匹配详情

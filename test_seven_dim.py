@@ -86,7 +86,7 @@ for i, r in enumerate(active[:15], 1):
     damage = r.get('jd_match_hard_damage', [])
     gaps = r.get('jd_match_gaps', [])
 
-    # Score breakdown: ①+②+③+④+⑤+⑥+⑦+广深
+    # Score breakdown: ①+②+③+④+⑤+⑥+⑦+目标城市
     scores = f"{r['score_hard']}+{r['score_project']}+{r['score_level']}+{r['score_salary']}+{r['score_scale']}+{r['score_growth']}+{jd_score}+{loc_bonus}"
 
     print(f"{i:2}. [{r['verdict']:6}] {r['title'][:42]:42} | {r['company'][:18]:18}")

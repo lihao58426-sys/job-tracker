@@ -173,11 +173,11 @@ export default function JobList() {
         </select>
         <select value={filterLocation} onChange={e => setFilterLocation(e.target.value)} style={selectStyle}>
           <option value="">全部地点</option>
-          <option value="广州">📍 广州</option>
-          <option value="深圳">📍 深圳</option>
+          <option value="上海">📍 上海</option>
+          <option value="杭州">📍 杭州</option>
           <option value="北京">北京</option>
-          <option value="上海">上海</option>
-          <option value="杭州">杭州</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
         </select>
       </div>
 
@@ -250,7 +250,7 @@ function JobRow({ job, rank, isExpanded, isSelected, onToggle, onSelect, onStatu
   onDetail: () => void;
   verdictColor: string;
 }) {
-  const isGZorSZ = job.location_bonus > 0;
+  const hasLocationBonus = job.location_bonus > 0;
 
   return (
     <>
@@ -287,14 +287,14 @@ function JobRow({ job, rank, isExpanded, isSelected, onToggle, onSelect, onStatu
           {job.position}
         </td>
         <td style={tdStyle}>
-          {isGZorSZ ? '📍 ' : ''}{job.location || '-'}
+          {hasLocationBonus ? '📍 ' : ''}{job.location || '-'}
         </td>
         <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: 12 }}>{job.salary_range || '-'}</td>
         <td style={{ ...tdStyle, fontWeight: 700, fontSize: 15 }}>
           <span style={{ color: job.total_score >= 50 ? '#52c41a' : job.total_score >= 40 ? '#faad14' : '#f5222d' }}>
             {job.total_score}
           </span>
-          {isGZorSZ && <span style={{ fontSize: 10, color: '#4fc3f7', marginLeft: 2 }}>+{job.location_bonus}</span>}
+          {hasLocationBonus && <span style={{ fontSize: 10, color: '#4fc3f7', marginLeft: 2 }}>+{job.location_bonus}</span>}
         </td>
         <td style={tdStyle}>
           <span style={{
@@ -350,7 +350,7 @@ function ExpandedDetail({ job }: { job: ApplicationListItem }) {
       <div>
         <strong>地点：</strong>
         {job.location_bonus > 0 ? '📍 ' : ''}{job.location || '-'}
-        {job.location_bonus > 0 && <span style={{ color: '#4fc3f7', marginLeft: 4 }}>(广深 +{job.location_bonus})</span>}
+        {job.location_bonus > 0 && <span style={{ color: '#4fc3f7', marginLeft: 4 }}>(目标城市 +{job.location_bonus})</span>}
       </div>
       <div><strong>类型：</strong>{job.job_type || '-'}</div>
       <div>

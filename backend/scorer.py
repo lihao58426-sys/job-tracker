@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 求职跟踪系统 - v2.0 打分逻辑
-薪资下限解析 + 广深地点加分 + 否决检查
+薪资下限解析 + 目标城市地点加分 + 否决检查
 """
 
 import re
@@ -11,15 +11,16 @@ import re
 # 地点加分
 # ============================================================
 
+# 目标城市加分映射（示例占位值，本地使用请改回真实目标城市）
 LOCATION_BONUS_MAP = {
-    "广州": 1, "深圳": 1,
-    "广州市": 1, "深圳市": 1,
-    "guangzhou": 1, "shenzhen": 1,
+    "上海": 1, "杭州": 1,
+    "上海市": 1, "杭州市": 1,
+    "shanghai": 1, "hangzhou": 1,
 }
 
 
 def get_location_bonus(location: str) -> int:
-    """检查地点是否广深，返回加分。"""
+    """检查地点是否在目标城市，返回加分。"""
     if not location:
         return 0
     loc_clean = location.strip().replace(" ", "")

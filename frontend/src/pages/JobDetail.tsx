@@ -75,7 +75,7 @@ export default function JobDetail() {
             <h2 style={{ fontSize: 22, marginBottom: 4 }}>{job.position}</h2>
             <p style={{ fontSize: 16, color: '#555' }}>{job.company}</p>
             <div style={{ display: 'flex', gap: 16, marginTop: 8, fontSize: 13, color: '#888', flexWrap: 'wrap' }}>
-              <span>📍 {job.location || '-'}{job.location_bonus > 0 ? ` (+${job.location_bonus} 广深加分)` : ''}</span>
+              <span>📍 {job.location || '-'}{job.location_bonus > 0 ? ` (+${job.location_bonus} 目标城市加分)` : ''}</span>
               <span>💰 {job.salary_range || '-'}</span>
               <span>📅 {job.date || '-'}</span>
               <span>📡 {job.channel || '-'}</span>
